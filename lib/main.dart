@@ -1,4 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+//
+import 'screens/products_overview_screen.dart';
+import 'screens/product_details_screen.dart';
+import 'providers/products.dart';
+import 'providers/cart.dart';
 
 void main() {
   runApp(const MyApp());
@@ -9,34 +15,29 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'My Shop',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      home: const MyHomePage(title: 'Home page'),
-    );
-  }
-}
-
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({Key? key, required this.title}) : super(key: key);
-
-  final String title;
-
-  @override
-  State<MyHomePage> createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.title),
-      ),
-      body: const Center(
-        child: Text('Lets build!'),
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(
+          create: (context) => Products(),
+        ),
+        ChangeNotifierProvider(
+          create: (context) => Cart(),
+        ),
+      ],
+      child: MaterialApp(
+        title: 'My Shop',
+        theme: ThemeData(
+          colorScheme: ColorScheme.fromSwatch(primarySwatch: Colors.purple)
+              .copyWith(secondary: Colors.orange),
+          fontFamily: 'Nunito',
+        ),
+        initialRoute: '/',
+        routes: {
+          ProductsOverviewScreen.routeName: (context) =>
+              const ProductsOverviewScreen(),
+          ProductDetailsScreen.routeName: (context) =>
+              const ProductDetailsScreen(),
+        },
       ),
     );
   }
