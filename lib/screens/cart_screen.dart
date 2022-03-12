@@ -5,9 +5,16 @@ import '../providers/cart.dart' show Cart;
 import '../widgets/cart_item.dart';
 import '../providers/orders.dart';
 
-class CartScreen extends StatelessWidget {
+class CartScreen extends StatefulWidget {
   static const routeName = '/cart';
   const CartScreen({Key? key}) : super(key: key);
+
+  @override
+  State<CartScreen> createState() => _CartScreenState();
+}
+
+class _CartScreenState extends State<CartScreen> {
+  bool _isLoading = false;
 
   @override
   Widget build(BuildContext context) {
@@ -41,14 +48,32 @@ class CartScreen extends StatelessWidget {
                     backgroundColor: Theme.of(context).primaryColor,
                   ),
                   TextButton(
-                      onPressed: () {
-                        Provider.of<Orders>(context, listen: false).addOrder(
-                          cart.items.values.toList(),
-                          cart.cartTotal,
-                        );
-                        cart.clearCart();
-                      },
-                      child: const Text('Order Now'))
+                      onPressed: cart.cartTotal <= 0
+                          ? null
+                          : () async {
+                              try {
+                                setState(() {
+                                  _isLoading = true;
+                                });
+                                await Provider.of<Orders>(context,
+                                        listen: false)
+                                    .addOrder(
+                                  cart.items.values.toList(),
+                                  cart.cartTotal,
+                                );
+                                setState(() {
+                                  _isLoading = false;
+                                });
+                                cart.clearCart();
+                              } catch (e) {
+                                setState(() {
+                                  _isLoading = false;
+                                });
+                              }
+                            },
+                      child: _isLoading
+                          ? const CircularProgressIndicator()
+                          : const Text('Order Now'))
                 ],
               ),
             ),
